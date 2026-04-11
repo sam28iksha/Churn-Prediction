@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Churn Predictor</title>
+</head>
+<body>
+
+<h2>Customer Churn Prediction</h2>
+
+<input id="login" placeholder="Login Frequency"><br><br>
+<input id="usage" placeholder="Daily Usage (mins)"><br><br>
+<input id="ticket" placeholder="Last Support Ticket"><br><br>
+<input id="age" placeholder="Account Age (days)"><br><br>
+
+<button onclick="predict()">Predict</button>
+
+<p id="result"></p>
+
+<script>
+async function predict() {
+  const data = {
+    Login_Frequency: Number(document.getElementById("login").value),
+    Daily_Usage_Mins: Number(document.getElementById("usage").value),
+    Last_Support_Ticket: Number(document.getElementById("ticket").value),
+    Account_Age_Days: Number(document.getElementById("age").value)
+  };
+
+  const res = await fetch("http://127.0.0.1:8000/predict", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+
+  document.getElementById("result").innerText =
+    result.churn ? "Customer will churn ❌" : "Customer will stay ✅";
+}
+</script>
+
+</body>
+</html>
