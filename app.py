@@ -24,13 +24,27 @@ def home():
 def predict(data: dict):
     try:
         df = pd.DataFrame([data])
+
+        # Get expected columns from model
         expected_cols = model.feature_names_in_
 
+        # Add missing columns
         for col in expected_cols:
             if col not in df:
                 df[col] = "unknown"
 
-        df = df.astype(str)
+        # Fix numeric columns
+        numeric_cols = ["tenure", "MonthlyCharges", "TotalCharges"]
+        for col in numeric_cols:
+            if col in df:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        # Convert everything else to string
+        for col in df.columns:
+            if col not in numeric_cols:
+                df[col] = df[col].astype(str)
+
+        # Reorder columns
         df = df[expected_cols]
 
         prediction = model.predict(df)
