@@ -2,30 +2,92 @@
 <html>
 <head>
   <title>Churn Predictor</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      width: 350px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>Customer Churn Prediction</h2>
+<div class="card">
+  <h2>Churn Prediction</h2>
 
-<input id="login" placeholder="Login Frequency"><br><br>
-<input id="usage" placeholder="Daily Usage (mins)"><br><br>
-<input id="ticket" placeholder="Last Support Ticket"><br><br>
-<input id="age" placeholder="Account Age (days)"><br><br>
+  <input id="tenure" placeholder="Tenure (months)">
+  <input id="charges" placeholder="Monthly Charges">
+  <input id="total" placeholder="Total Charges">
 
-<button onclick="predict()">Predict</button>
+  <select id="contract">
+    <option>Month-to-month</option>
+    <option>One year</option>
+    <option>Two year</option>
+  </select>
 
-<p id="result"></p>
+  <select id="internet">
+    <option>DSL</option>
+    <option>Fiber optic</option>
+    <option>No</option>
+  </select>
+
+  <select id="payment">
+    <option>Electronic check</option>
+    <option>Mailed check</option>
+    <option>Bank transfer (automatic)</option>
+    <option>Credit card (automatic)</option>
+  </select>
+
+  <button onclick="predict()">Predict</button>
+
+  <p id="result"></p>
+</div>
 
 <script>
 async function predict() {
   const data = {
-    Login_Frequency: Number(document.getElementById("login").value),
-    Daily_Usage_Mins: Number(document.getElementById("usage").value),
-    Last_Support_Ticket: Number(document.getElementById("ticket").value),
-    Account_Age_Days: Number(document.getElementById("age").value)
+    tenure: Number(document.getElementById("tenure").value),
+    MonthlyCharges: Number(document.getElementById("charges").value),
+    TotalCharges: Number(document.getElementById("total").value),
+    Contract: document.getElementById("contract").value,
+    InternetService: document.getElementById("internet").value,
+    PaymentMethod: document.getElementById("payment").value
   };
 
-  const res = await fetch("http://127.0.0.1:8000/predict", {
+  const res = await fetch("http://127.0.0.1:8001/predict", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(data)
@@ -34,7 +96,7 @@ async function predict() {
   const result = await res.json();
 
   document.getElementById("result").innerText =
-    result.churn ? "Customer will churn ❌" : "Customer will stay ✅";
+    result.churn ? "⚠️ Customer will churn" : "✅ Customer will stay";
 }
 </script>
 
