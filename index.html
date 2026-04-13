@@ -1,69 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Churn Predictor</title>
+  <title>ChurnSense AI</title>
+
   <style>
     body {
-      font-family: Arial;
-      background: #f4f6f8;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #667eea, #764ba2);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
+      color: #333;
     }
 
-    .card {
+    .container {
       background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-      width: 350px;
+      padding: 30px;
+      border-radius: 15px;
+      width: 380px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: gray;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 13px;
+      margin-top: 10px;
+      display: block;
     }
 
     input, select {
       width: 100%;
-      padding: 8px;
-      margin: 8px 0;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
     }
 
     button {
       width: 100%;
-      padding: 10px;
-      background: #4CAF50;
+      padding: 12px;
+      margin-top: 20px;
+      background: #667eea;
       color: white;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #5a67d8;
     }
 
     #result {
-      margin-top: 15px;
-      font-weight: bold;
+      margin-top: 20px;
       text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .churn {
+      color: red;
+    }
+
+    .stay {
+      color: green;
     }
   </style>
 </head>
 
 <body>
 
-<div class="card">
-  <h2>Churn Prediction</h2>
+<div class="container">
+  <h1>ChurnSense AI</h1>
+  <p class="subtitle">Predict customer churn instantly</p>
 
-  <input id="tenure" placeholder="Tenure (months)">
-  <input id="charges" placeholder="Monthly Charges">
-  <input id="total" placeholder="Total Charges">
+  <label>Tenure (months)</label>
+  <input id="tenure" type="number">
 
+  <label>Monthly Charges</label>
+  <input id="charges" type="number">
+
+  <label>Total Charges</label>
+  <input id="total" type="number">
+
+  <label>Contract</label>
   <select id="contract">
     <option>Month-to-month</option>
     <option>One year</option>
     <option>Two year</option>
   </select>
 
+  <label>Internet Service</label>
   <select id="internet">
     <option>DSL</option>
     <option>Fiber optic</option>
     <option>No</option>
   </select>
 
+  <label>Payment Method</label>
   <select id="payment">
     <option>Electronic check</option>
     <option>Mailed check</option>
@@ -71,13 +120,17 @@
     <option>Credit card (automatic)</option>
   </select>
 
-  <button onclick="predict()">Predict</button>
+  <button onclick="predict()">Predict Churn</button>
 
-  <p id="result"></p>
+  <div id="result"></div>
 </div>
 
 <script>
 async function predict() {
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerText = "Predicting...";
+  resultDiv.className = "";
+
   const data = {
     tenure: Number(document.getElementById("tenure").value),
     MonthlyCharges: Number(document.getElementById("charges").value),
@@ -95,8 +148,13 @@ async function predict() {
 
   const result = await res.json();
 
-  document.getElementById("result").innerText =
-    result.churn ? "⚠️ Customer will churn" : "✅ Customer will stay";
+  if (result.churn) {
+    resultDiv.innerText = "⚠️ High Risk: Customer likely to churn";
+    resultDiv.className = "churn";
+  } else {
+    resultDiv.innerText = "✅ Safe: Customer likely to stay";
+    resultDiv.className = "stay";
+  }
 }
 </script>
 
