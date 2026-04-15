@@ -122,7 +122,10 @@ export default function App() {
             <Zap className="text-purple-400 w-7 h-7" />
             <h1 className="text-4xl font-bold text-white">ChurnSense AI</h1>
           </div>
-          <p className="text-slate-400">Predict customer churn instantly</p>
+          <p className="text-slate-400 text-base">Predict customer churn instantly</p>
+          <p className="text-slate-500 text-sm mt-2 max-w-sm mx-auto">
+            Built for <span className="text-purple-400 font-medium">telecom companies</span> — enter a customer's subscription details to find out if they're at risk of cancelling their plan.
+          </p>
         </div>
 
         <div className="bg-slate-900/80 rounded-2xl p-8 border border-slate-800">
@@ -194,12 +197,18 @@ export default function App() {
               exit={{ opacity: 0 }}
               className="mt-6 p-6 rounded-xl bg-slate-800 border border-slate-700"
             >
-              <h2 className={`text-xl font-bold mb-2 ${prediction.churn ? 'text-red-400' : 'text-green-400'}`}>
+              <h2 className={`text-xl font-bold mb-1 ${prediction.churn ? 'text-red-400' : 'text-green-400'}`}>
                 {prediction.churn ? "⚠️ High Churn Risk" : "✅ Low Churn Risk"}
               </h2>
 
+              <p className="text-slate-500 text-xs mb-3">
+                {prediction.churn
+                  ? "This customer has a high likelihood of cancelling their plan."
+                  : "This customer is likely to stay with their current plan."}
+              </p>
+
               <p className="text-slate-300 mb-3">
-                Confidence: {Math.round((prediction.confidence || 0) * 100)}%
+                Churn Probability: {Math.round((prediction.confidence || 0) * 100)}%
               </p>
 
               <div className="h-2 bg-slate-700 rounded-full">
