@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap } from 'lucide-react';
 
+const LIMITS = {
+  tenure: { min: 1, max: 72, label: "Tenure must be between 1 and 72 months." },
+  MonthlyCharges: { min: 20, max: 200, label: "Monthly charges must be between $20 and $200." }
+};
+
 export default function App() {
   const [formData, setFormData] = useState({
     tenure: '',
@@ -12,10 +17,29 @@ export default function App() {
     PaymentMethod: 'Electronic check'
   });
 
+  const [errors, setErrors] = useState({});
   const [prediction, setPrediction] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const set = (key) => (v) => setFormData({ ...formData, [key]: v });
+  const set = (key) => (v) => {
+    setFormData({ ...formData, [key]: v });
+    // Clear error on change
+    if (errors[key]) setErrors({ ...errors, [key]: null });
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    for (const key of ['tenure', 'MonthlyCharges']) {
+      const val = Number(formData[key]);
+      if (!formData[key]) {
+        newErrors[key] = "This field is required.";
+      } else if (val < LIMITS[key].min || val > LIMITS[key].max) {
+        newErrors[key] = LIMITS[key].label;
+      }
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const generateReasons = (formData, churn) => {
     const tenure = Number(formData.tenure);
@@ -54,6 +78,8 @@ export default function App() {
   };
 
   const handlePredict = async () => {
+    if (!validate()) return;
+
     setIsLoading(true);
     setPrediction(null);
 
@@ -135,14 +161,20 @@ export default function App() {
               label="Tenure (months)"
               value={formData.tenure}
               onChange={set('tenure')}
-              placeholder="e.g. 12"
+              placeholder="1 – 72"
+              min={1}
+              max={72}
+              error={errors.tenure}
             />
 
             <FormField
               label="Monthly Charges ($)"
               value={formData.MonthlyCharges}
               onChange={set('MonthlyCharges')}
-              placeholder="e.g. 65"
+              placeholder="$20 – $200"
+              min={20}
+              max={200}
+              error={errors.MonthlyCharges}
             />
 
             <SelectField
@@ -182,7 +214,7 @@ export default function App() {
 
           <button
             onClick={handlePredict}
-            disabled={isLoading || !formData.tenure || !formData.MonthlyCharges}
+            disabled={isLoading}
             className="mt-6 w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-colors"
           >
             {isLoading ? "Analyzing..." : "Predict Churn"}
@@ -236,7 +268,7 @@ export default function App() {
   );
 }
 
-function FormField({ label, value, onChange, placeholder }) {
+function FormField({ label, value, onChange, placeholder, min, max, error }) {
   return (
     <div>
       <label className="text-sm text-slate-400 mb-1 block">{label}</label>
@@ -245,8 +277,12 @@ function FormField({ label, value, onChange, placeholder }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full p-2 rounded bg-slate-800 text-white border border-slate-700 focus:outline-none focus:border-purple-500 placeholder-slate-600"
+        min={min}
+        max={max}
+        className={`w-full p-2 rounded bg-slate-800 text-white border focus:outline-none placeholder-slate-600
+          ${error ? 'border-red-500 focus:border-red-400' : 'border-slate-700 focus:border-purple-500'}`}
       />
+      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
     </div>
   );
 }
