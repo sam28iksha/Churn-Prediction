@@ -210,7 +210,7 @@ function CustomForm() {
       setTargetColumn(result.columns[result.columns.length - 1]);
       setStep('select-target');
     } catch (e) {
-      setError("Upload failed. Please check your backend is running.");
+      setError("Upload failed. Please try again");
     }
     setIsLoading(false);
   };
